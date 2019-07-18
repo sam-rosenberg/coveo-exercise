@@ -1,0 +1,285 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Monty API",
+    "description": "The Monty API allows a user to manage knights, their relationships, and shrubberies.",
+    "version": "1.0"
+  },
+  "host": "dark.forest.com",
+  "basePath": "/rest/v1",
+  "schemes": [
+    "http"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/knights": {
+      "get": {
+        "tags": [
+          "Knights"
+        ],
+        "summary": "List all knights",
+        "operationId": "knightsIndex",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/KnightModel"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Knights"
+        ],
+        "summary": "Create a knight",
+        "description": "Add a new knight to the Dark Forest.",
+        "operationId": "knightsCreate",
+        "parameters": [
+          {
+            "$ref": "#/parameters/knightInfo"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/KnightModel"
+            }
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          }
+        }
+      }
+    },
+    "/knights/{knightId}": {
+      "get": {
+        "tags": [
+          "Knights"
+        ],
+        "summary": "Show a knight",
+        "description": "Get the data of a single knight in the Dark Forest.",
+        "operationId": "knightsShow",
+        "parameters": [
+          {
+            "$ref": "#/parameters/knightId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/KnightModel"
+            }
+          },
+          "404": {
+            "$ref": "#/responses/404"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Knights"
+        ],
+        "summary": "Update a knight",
+        "description": "Modify the data of a single knight in the Dark Forest.",
+        "operationId": "knightsUpdate",
+        "parameters": [
+          {
+            "$ref": "#/parameters/knightId"
+          },
+          {
+            "$ref": "#/parameters/knightInfo"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "schema": {
+              "$ref": "#/definitions/KnightModel"
+            }
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "404": {
+            "$ref": "#/responses/404"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Knights"
+        ],
+        "summary": "Delete a knight",
+        "description": "Remove the data of a knight who has been slain.",
+        "operationId": "knightsDelete",
+        "parameters": [
+          {
+            "$ref": "#/parameters/knightId"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "application/json": {}
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "KnightModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "A unique GUID that identifies the knight. This is generated when the knight is created, and it cannot be manually set or modified.",
+          "type": "string",
+          "format": "uuid",
+          "readOnly": true,
+          "example": "603817fb-4979-4897-92b6-9c37b3fe345c"
+        },
+        "name": {
+          "description": "The knight's name. It must begin with \"Sir \" or \"S1r \". This can be modified at any time.",
+          "type": "string",
+          "pattern": "^(Sir |S1r )[a-zA-Z\\d\\s]{1,252}$",
+          "example": "Sir Galahad"
+        },
+        "age": {
+          "description": "The knight's age, in years. Once set, this can only be modified if the new value would increase the current age.",
+          "type": "integer",
+          "format": "int32",
+          "minimum": 18,
+          "maximum": 65,
+          "example": 38
+        },
+        "favoriteColor": {
+          "description": "The knight's favorite color. Once set, this cannot be modified.",
+          "type": "string",
+          "enum": [
+            "RED",
+            "GREEN",
+            "BLUE"
+          ],
+          "example": "RED"
+        },
+        "bestFriend": {
+          "description": "The GUID that identifies the knight's best friend. Once set to a value that is not the empty string, this cannot be modified unless the current best friend is slain (aka deleted), in which case this is automatically reset to the empty string.",
+          "type": "string",
+          "format": "uuid",
+          "example": "260354c0-4267-4bf0-a1d5-192530011248"
+        },
+        "shrubberies": {
+          "description": "All of the shrubberies that belong to the knight.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ShrubberyModel"
+          }
+        }
+      }
+    },
+    "ShrubberyModel": {
+      "type": "object",
+      "properties": {
+        "height": {
+          "description": "The height of the shrubbery. Once set, this cannot be modified.",
+          "type": "number",
+          "format": "float",
+          "minimum": 0,
+          "example": 1
+        },
+        "radius": {
+          "description": "The radius of the shrubbery. Once set, this cannot be modified.",
+          "type": "number",
+          "format": "float",
+          "minimum": 0,
+          "example": 0.5
+        },
+        "volume": {
+          "description": "The estimated volume of the shrubbery. This is calculated automatically; it cannot be manually set or modified.",
+          "type": "number",
+          "format": "float",
+          "minimum": 0,
+          "readOnly": true,
+          "example": 0.7
+        },
+        "description": {
+          "description": "A description of the shrubbery. This must include the word \"nice\". This can be modified at any time.",
+          "type": "string",
+          "pattern": "(nice)",
+          "example": "such a nice shrub"
+        },
+        "price": {
+          "description": "The price of the shrubbery. This is automatically calculated as the shrubbery's estimated volume * the number of characters in its description. This cannot be manually set or modified.",
+          "type": "integer",
+          "format": "int32",
+          "minimum": 0,
+          "readOnly": true,
+          "example": 11
+        }
+      }
+    }
+  },
+  "parameters": {
+    "knightInfo": {
+      "name": "knightInfo",
+      "in": "body",
+      "description": "The knight data.",
+      "required": true,
+      "schema": {
+        "$ref": "#/definitions/KnightModel"
+      }
+    },
+    "knightId": {
+      "name": "knightId",
+      "in": "path",
+      "description": "The GUID that uniquely identifies the target knight.",
+      "required": true,
+      "type": "string"
+    }
+  },
+  "responses": {
+    "400": {
+      "description": "Bad Request",
+      "schema": {
+        "type": "string"
+      },
+      "examples": {
+        "application/json": {
+          "Message": "Error: Cannot set the 'age' property to a value higher than 65."
+        }
+      }
+    },
+    "404": {
+      "description": "Not Found",
+      "schema": {
+        "type": "string"
+      },
+      "examples": {
+        "application/json": {
+          "Message": "Error: No knight with ID '0b58c0c3-79e2-46b7-8bc7-2b348fbbd8aa' found."
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Knights",
+      "description": "Manage knights"
+    }
+  ]
+}
